@@ -1,0 +1,154 @@
+
+
+
+
+Structured Query Language (SQL) basics
+
+
+
+
+- Data Definition Language  (DDL)
+    -- CREATE DATABASE database_name;
+    -- DROP DATABASE database_name;
+
+    -- CREATE TABLE table_name (
+            col1_name DATATYPE,
+            col2_name DATATYPE,
+            ...,
+            PRIMARY KEY (col1_name),
+            FOREIGN KEY (col2_name) REFERENCES table2_name(col2_name_in_table2)
+        );
+
+    -- DROP TABLE table_name;
+
+
+- constraints
+    -- NOT NULL
+            CREATE TABLE table_nale (
+                col_id int NOT NULL,
+                col_full_name varchar(255) NOT NULL, 
+            );
+    
+    -- DEFAULT - add default value specified (at column creation) if no value is provided in the specific insert
+            CREATE TABLE table_name (
+                col_id int NOT NULL,
+                col_city varchar(30) DEAULT "Toronto"
+            );
+
+
+
+- Data Manipulation Language (DML)
+    
+    -- ALTER TABLE table_name ADD (
+            col_name DATATYPE,
+            ...
+        );
+
+    -- ALTER TABLE table_name DROP col_name;
+
+    -- ALTER TABLE table_name MODIFY col_name new_DATATYPE;
+
+    -- INSERT INTO table_name (col1, col2, col3, ...) 
+              VALUES 
+              (v1_col1, v1_col2, v1_col3, ...),
+              (v2_col1, v2_col2, v2_col3, ...),
+              (v3_col1, v3_col2, v3_col3, ...);
+    
+    -- INSERT INTO target_table (col_source)
+        SELECT col_source 
+        FROM source_table; - copy and paste the col_source column from source table to target table
+
+    -- UPDATE table_name 
+        SET col1 = new_value, col2 = new_value 
+        WHERE col_id = condition;
+
+    -- DELETE FROM table_name WHERE col1 = condition;
+
+
+
+
+- Data Query Language (DQL)
+    -- SELECT col1, col2 FROM table_name WHERE col1 = condition;
+
+
+
+- Arithmetic Operators
+    -- SELECT salary / 12 FROM employee; ----> generate monthly salary for each employee
+
+
+- Comparison Operators
+    -- SELECT * FROM employee WHERE salary <> 12000;  ----> <> is 'not equal'
+
+
+- ORDER BY clause
+    -- SELECT col_1, col_2, col_3, ...
+        FROM table_name 
+        ORDER BY col_name ASC/DESC, col_name2 ASC/DESC;
+
+
+- WHERE clause - BETWEEN, LIKE, IN
+    -- SELECT *
+        FROM student_table
+        WHERE date_of_birth BETWEEN '2010-01-01' AND '2010-01-31'; 
+    
+    -- SELECT *
+        FROM student_table
+        WHERE faulty LIKE "Sc%";
+    
+    -- wildcard chars
+        --- % - represent 0, 1 or multiple chars
+        --- _ - represent a single char
+
+    -- SELECT *
+        FROM student_table
+        WHERE country IN ('USA', 'UK');
+
+
+- DISTINCT
+    -- SELECT DISTINCT country
+        FROM  student_table;
+    
+    -- DISTINCT clause considers NULL to be a unique value, and will output it
+
+
+
+
+
+
+
+
+
+
+
+
+Database Basics
+
+
+
+
+- Schema types
+
+    -- logical database schema: how the data is organized in terms of tables 
+        --- Entity Relationship Model: illustrating relationships between entity types
+    
+    -- physical schema: how the physical structure of a database is stored in a disk
+
+
+- normalization
+    -- 1NF 
+        --- no multi-value attribute
+        --- use different tables to avoid repeated column values ---> led to insert, update error
+    -- 2NF
+        --- no partial dependencies
+                partial dependencies example: table consists of Patient ID, Vaccine ID, Patient name, Vaccine name, Status (completed or none)
+                this table has composite primary key, Patient ID + Vaccine ID, to uniquely identifying Status for a given patient and for a given vac
+                so there is a functional dependency between Status and the primary key
+                but there is a partial dependency between the primary key and Patient name because Patient name only depends on Patient ID
+        --- Splitting the above example into three tables, patient table, vaccine table, and status table eliminates the partial dependency and achieve 2NF
+    -- 3NF
+        --- no transitive dependency
+                non-key attribute cannot depend on one another
+
+        
+
+

@@ -1,0 +1,240 @@
+
+
+
+Aliases
+
+
+- renaming tables and columns
+    -- SELECT col1_name AS col1_alias, col_2, col_3, col4 AS "col3 alias"
+        FROM table_name;
+    
+    -- SELECT CONCAT(col_1, " ", col_2) AS new_name
+        FROM table_name;
+
+- multiple tables
+    -- SELECT x.col1, y.col2 
+        FROM table1 AS x, table2 AS y
+
+
+
+
+
+Joins
+
+
+- inner join (records matching both table)
+    -- SELECT t1.col 
+        FROM table1_name AS t1 
+        INNER JOIN table2_name
+        ON t1.col_foreignkey = table2_name.col_primarykey;
+
+
+- left join (all records from left table and matching records from right)
+    -- LEFT JOIN 
+
+
+- union
+    --  SELECT col1, col2 FROM table1 
+        UNION 
+        SELECT col1, col2 FROM table2 
+    -- constraints
+        --- same number of columns
+        --- same column names
+        --- same datatypes in each column 
+        --- all related columns must have same order
+    -- it returns only distinct values from both table 
+
+
+
+
+
+
+
+
+Group By
+
+- SELECT col1, COUNT(col2) as count
+    FROM table_name 
+    WHERE col3 IS NOT NULL
+    GROUP BY col1
+    HAVING count > 10;
+
+
+- aggregate functions
+    -- SUM()
+    -- AVERAGE()
+    -- MAX()
+    -- MIN()
+    -- COUNT()
+
+
+
+
+
+Replace
+
+- unlike traditional Insert and Update function, Replace first check for a duplicate primary key
+    -- if found, it deletes the existing record and replaces it with the new one
+
+- REPLACE INTO table_name (col1, col2, col3) 
+    VALUES (col1_value, col2_value, col3_value);
+
+- REPLACE INTO table_name (col1, col2, col3)
+    SET col_name = new_value;
+    --  if col2_name exist and was not specified after SET, col2_name = NULL
+
+
+
+
+
+
+
+Constraints
+
+- Referential integrity constraints
+    -- when two tables are connected using primary key and foreign key, 
+        deleting records from the first table which has unique primary key connected to second table will result in error
+    -- ON DELETE CASCADE - automatically make changes to the second table when entry got deleted from first table 
+    -- ON UPDATE CASCADE - automatically make updates to the second table 
+
+- on second table creation - primary key as the foreign key of the first table side
+        CREATE TABLE table_name (
+            ...,
+            FOREIGN KEY (t2_pk) REFERENCES t1(t1_fk) ON DELETE CASCADE ON UPDATE CASCADE
+        );
+
+
+
+
+
+Copy tables
+
+- CREATE TABLE database1_name.new_table_name
+    SELECT cols 
+    FROM database2_name.existing_table;
+
+    -- doesn't copy constraints
+
+- CREATE TABLE new_table LIKE old_table;
+    -- this copies structure & constraints, but not the content
+    -- INSERT INTO new_table SELECT * FROM old_table -----> to copy the content
+
+
+
+
+
+Subqueries
+
+
+- SELECT * FROM employee
+    WHERE annual_salary > (SELECT AVERAGE(annual_salary) FROM employee);
+
+
+- subquery comparison operator
+    -- ALL & ANY
+        SELECT * FROM employee 
+        WHERE annual_salary < ALL (SELECT annual_salary FROM employee WHERE job_tital IN ('head chef', 'head manager'));
+    
+    -- EXISTS & NOT EXISTS
+        SELECT * FROM employee 
+        WHERE EXISTS (SELECT * FROM bookings WHERE bookings.employeeID = employee.employID AND job_title IN ('head chef', 'head waiter'));
+
+
+
+
+
+
+Views
+
+- CREATE VIEW top3products AS 
+    SELECT products.Item, orders.Quantity, orders.cost FROM orders
+    INNER JOIN products ON orders.productID = products.productID ORDER BY orders.Cost DESC LIMIT 3;
+
+
+- DROP VIEW top3products;
+
+
+
+
+
+
+Functions 
+
+
+- math functions 
+    -- ROUND()
+        SELECT col1, ROUND(num_col, decimal_places) ...
+    -- MOD()
+        SELECT col1, MOD(num_col [or value], value_dividing) ...
+
+
+- string functions
+    -- CONCAT(string1, string2, ...)
+    -- SUBSTR(string, start_idx, length)
+    -- UCASE() & LCASE()
+
+
+- date functions
+    -- CURRENT_DATE()
+    -- CURRENT_TIME()
+    -- DATE_FORMAT() - format date 
+        --- DATE_FORMAT('YYY-MM-DD', '%Y-%m-%d %H:%i:%s') ------> example output: "2023-10-19 15:25:45"
+    -- DATEDIFF()
+        --- SELECT DATEDIFF("date_1", "date_2"); ------------> date_1 - date_2
+
+
+
+- comparison functions
+    -- GREATEST()
+        SELECT ItemID, 
+        GREATEST(Q1, Q2, Q3, Q4) AS highest,
+        LEAST(Q1, Q2, Q3, Q4) AS lowest,
+        FROM sales_revenue;
+
+    -- LEAST()
+
+    -- ISNULL()
+        SELECT * 
+        FROM table_name 
+        WHERE ISNULL(col)
+
+
+
+- control flow functions
+    -- CASE function 
+        SELECT itemID 
+        CASE 
+            WHEN LEAST (Q1, Q2, Q3, Q4) <= 25000 THEN "Loss"
+            ELSE "Profit"
+        END AS Profit_Loss
+        FROM sales_revenue;
+
+
+
+
+
+Store procedures 
+
+- reusable block of code invoked on command
+
+
+- CREATE PROCEDURE procedure_name(parameter_value INT)
+    SELECT column_name
+    FROM table_name 
+    WHERE value = parameter_value;
+
+
+- CALL procedure_name(parameter_value);
+
+- DROP PROCEDURE procedure_name;
+
+
+
+
+
+
+
+
+
+
+

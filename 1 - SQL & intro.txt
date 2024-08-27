@@ -25,14 +25,26 @@ Structured Query Language (SQL) basics
 - constraints
     -- NOT NULL
             CREATE TABLE table_nale (
-                col_id int NOT NULL,
-                col_full_name varchar(255) NOT NULL, 
+                col_id INT NOT NULL,
+                col_full_name VARCHAR(255) NOT NULL, 
             );
     
     -- DEFAULT - add default value specified (at column creation) if no value is provided in the specific insert
             CREATE TABLE table_name (
-                col_id int NOT NULL,
-                col_city varchar(30) DEAULT "Toronto"
+                col_id INT NOT NULL,
+                col_city VARCHAR(30) DEAULT "Toronto"
+            );
+    
+    -- unique - values must be unique to each other
+            CREATE TABLE table_name (
+                col_id INT NOT NULL PRIMARY KEY,
+                col_phone_number INT NOT NULL UNIQUE
+            );
+    
+    -- domain constraint - constrain the range of values a field can take
+            CREATE TABLE table_name (
+                col_id INT NOT NULL PRIMARY KEY,
+                col_num_guests INT NOT NULL CHECK(col_num_guests <= 8)
             );
 
 
@@ -46,7 +58,9 @@ Structured Query Language (SQL) basics
 
     -- ALTER TABLE table_name DROP col_name;
 
-    -- ALTER TABLE table_name MODIFY col_name new_DATATYPE;
+    -- ALTER TABLE table_name 
+        MODIFY col_name new_DATATYPE 
+        MODIFY col2_name new_DATATYPE NOT NULL;
 
     -- INSERT INTO table_name (col1, col2, col3, ...) 
               VALUES 
@@ -102,6 +116,10 @@ Structured Query Language (SQL) basics
     -- SELECT *
         FROM student_table
         WHERE country IN ('USA', 'UK');
+    
+    -- SELECT *
+        FROM student_table
+        WHERE NOT (country = 'USA' OR country = 'UK');
 
 
 - DISTINCT

@@ -1,0 +1,60 @@
+
+
+- CREATE/DROP DATABASE name
+- USE database_name 
+
+- CREATE TABLE name (col DATATYPE, PRIMARY KEY(col), FOREIGN KEY(col) REFERENCES name2(col))
+
+- SHOW COLUMNS FROM table_name
+
+- (col INT NOT NULL)
+- (col INT DEFAULT 0)
+- (col INT NOT NULL PRIMARY KEY)
+- (col INT NOT NULL UNIQUE)
+- (num INT NOT NULL CHECK(num<=8))
+- (FOREIGN KEY (t2_pk) REFERENCES t1(t1_fk) ON DELETE CASCADE ON UPDATE CASCADE)
+
+- ALTER TABLE name ADD (col DATATYPE) / DROP col / MODIFY col new_DATATYPE
+
+- INSWERT INTO table (col1, col2) VALUES (v11,v12), (v21,v22)
+
+- UPDATE table SET col1 = new_value WHERE col2 = condition
+
+- DELETE FROM table WHERE col1 = condition 
+
+- RENAME TABLE old_name TO new_name
+
+
+
+- SELECCT DISTINCT FROME table WHERE (none_zero <> 0) OR (date BETWEEN date1 AND date2) OR (col1 LIKE "Sc%") OR (NOT col2 IN (val1, val2))
+
+- WHERE expression IS NOT NULL
+
+- ORDER BY col ASC/DESC LIMIT 3
+
+
+
+- CONCAT(col_1, " ", col_2)
+
+
+- SELECT * FROM t1 INNER JOIN t2 ON t1.fk = t2.pk
+
+- SELECT col1, col2 FROM t1 UNION SELECT col1, col2 FROM t2
+
+
+- SELECT department, SUM(orderTotal) FROM orders GROUP BY department HAVING SUM(orderTotal) > 2000
+
+- REPLACE INTO table (col1, col2) VALUES (col1_val, col2_val)
+- REPLACE INTO table SET col1 = col1_val, col2 = col2_val
+
+
+
+
+- CREATE VIEW view_name AS 
+    SELECT ....
+
+- DROP VIEW view_name
+
+
+- SELECT col1, ROUND(num_col, decimal_places) ...
+- SELECT col1, MOD(num_col [or value], value_dividing) ...

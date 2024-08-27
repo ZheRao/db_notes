@@ -135,7 +135,7 @@ Git and Github
 
     -- git commit -m 'message' -------> commit the changes locally, not pushed to the server yet
 
-    -- git init ----> initialize a local repository unconnected to the central repository server
+    -- git init --initial-branch=main ----> initialize a local repository unconnected to the central repository server
         --- git remote will be empty since no connection set 
 
     -- git remote add origin git@github.com:____________.git -------> create connection between local and remote repository
@@ -143,7 +143,7 @@ Git and Github
                 ls ---> returns blank because a branch hasn't been set up that matches with the server repository
                 git checkout main ---> fix the issue
     
-    -- git push origin main -----> push changes made to the main branch
+    -- git push -u origin main -----> push changes made to the main branch
 
 
 - branching - exists in isolation, changes need to be merged back to the main branch

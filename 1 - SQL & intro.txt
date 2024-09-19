@@ -11,7 +11,7 @@ Structured Query Language (SQL) basics
     -- CREATE DATABASE database_name;
     -- DROP DATABASE database_name;
 
-    -- CREATE TABLE table_name (
+    -- CREATE TABLE (IF NOT EXISTS) table_name (
             col1_name DATATYPE,
             col2_name DATATYPE,
             ...,
@@ -25,7 +25,7 @@ Structured Query Language (SQL) basics
 - constraints
     -- NOT NULL
             CREATE TABLE table_nale (
-                col_id INT NOT NULL,
+                col_id INT NOT NULL AUTO_INCREMENT,
                 col_full_name VARCHAR(255) NOT NULL, 
             );
     

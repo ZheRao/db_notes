@@ -58,3 +58,39 @@
 
 - SELECT col1, ROUND(num_col, decimal_places) ...
 - SELECT col1, MOD(num_col [or value], value_dividing) ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Data Types
+
+- boolean -----> BIT 
+- DECIMAL(8,2) ----> decimal number with 8 total digits with 2 after decimal place 
+
+
+
+
+
+
+
+
+Special Command 
+- AUTO_INCREMENT 

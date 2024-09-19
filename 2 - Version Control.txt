@@ -143,6 +143,8 @@ Git and Github
                 ls ---> returns blank because a branch hasn't been set up that matches with the server repository
                 git checkout main ---> fix the issue
     
+    -- git remote rm origin -----> remove remote connection
+    
     -- git push -u origin main -----> push changes made to the main branch
 
 

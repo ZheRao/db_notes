@@ -134,6 +134,11 @@ Subqueries
     -- ALL & ANY
         SELECT * FROM employee 
         WHERE annual_salary < ALL (SELECT annual_salary FROM employee WHERE job_tital IN ('head chef', 'head manager'));
+
+        SELECT ProductID 
+        FROM Orders 
+        WHERE ProductID = ANY (SELECT ProductID FROM Orders WHERE Quantity >= 100);
+
     
     -- EXISTS & NOT EXISTS
         SELECT * FROM employee 

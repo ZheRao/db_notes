@@ -1,0 +1,373 @@
+
+
+
+
+
+
+Functions and Stored Procedures 
+
+
+
+- variables
+    -- @variable_name = value; 
+
+    -- inside and outside of procedure 
+        --- SET @var = value;
+
+    -- inside procedure
+        --- DECLEAR var DECIMAL(5, 2) DEFAULT  -------> total number of digits in the value is 5, 2 digits after the decimal point
+    
+    -- inside SELECT
+        --- SELECT @max_order := MAX(cost) FROM orders;
+    
+    -- assign output of a function to a variable inside SELECT
+        --- SELECT AVG(cost) INTO @average_cost FROM orders;
+
+
+
+- parameters
+    -- IN ---> default parameter type, used to pass an argument or value to a stored procedure
+        --- CREATE PROCEDURE calculate_tax(IN var_salary DECIMAL(10,2)) 
+            SELECT var_salary * 0.2 AS TAX;
+        --- CALL calculate_tax(1000);
+    
+
+    -- OUT ---> pass a value to a variable outside of the procedure
+        --- CREATE PROCEDURE get_lowest_cost (OUT var_lowestcost DECIMAL(6,2))
+            SELECT MIN(cost) INTO var_lowestcost FROM orders; 
+        --- CALL get_lowest_cost(@lowest_cost); 
+        --- SELECT @lowest_cost ----> displays the variable
+
+    -- INOUT ----> pass an argument to the procedure and then pass the new value back to the outside
+        --- CREATE PROCEDURE square(INOUT var_num INT)
+            BEGIN
+                SET var_num = var_num * var_num;
+            END
+        --- SET @num = 5;
+        --- CALL square(@num); ------> num ---> 25
+
+
+
+
+
+
+
+User Defined Functions
+
+
+
+- CREATE FUNCTION function_name()
+    RETURNS datatype DETERMINISTIC
+    RETURN 
+
+
+- CREATE FUNCTION find_total_cost(cost DECIMAL(5,2))
+    RETURNS DECIMAL(5,2) DETERMINISTIC 
+    RETURN (cost - (cost*0.1)); 
+
+
+    DELIMITER //  -----> changing the delimitor from ; to //
+
+    CREATE FUNCTION get_total_cost(cost DECIMAL(5,2)) 
+    RETURNS DECIMAL(5,2) DETERMINISTIC
+    BEGIN
+        IF (cost >= 100 AND cost < 500) THEN 
+            SET cost = cost * 0.9;
+        ELSEIF (cost >= 500) THEN 
+            SET cost = cost * 0.8;
+        END IF;
+        RETURN(cost);
+    END//
+
+    DELIMITER ;
+    
+
+
+
+
+Trigger
+
+
+
+
+- CREATE TRIGGER trigger_name 
+    TRIGGER TYPE 
+    ON table_name FOR EACH ROW
+    BEGIN
+        statement_one
+        statement_two
+    END 
+
+
+- DROP TRIGGER IF EXIST schema_name.trigger_name 
+
+
+
+- types of triggers 
+    -- execution level
+        --- row-level trigger: invoked for each row 
+                MySQL only support row-level triggers
+        --- statement-level trigger: trigger invoked for each statement 
+
+    -- execution time
+        --- before: trigger must be invoked before any action is performed on a table row 
+        --- after: invoked after the action is performed on a table row 
+    
+    -- actions 
+        -- BEFORE/AFTER INSERT
+        -- BEFORE/AFTER UPDATE
+        -- BEFORE/AFTER DELETE
+
+
+
+- example
+    -- CREATE TRIGGER OrderQtyCheck
+        BEFORE INSERT 
+        ON Orders FOR EACH ROW 
+        BEGIN 
+            IF NEW.orderQty < 0 THEN 
+            SET NEW.orderQty = 0;
+        END;
+    
+    -- CREATE TRIGGER LogNewOrderInsert 
+        AFTER INSERT
+        ON Orders FOR EACH ROW 
+        INSERT INTO Audits VALUES ("AFTER", "A new order was inserted", "INSERT");
+    
+    -- CREATE TRIGGER AfterDeleteOrder 
+        AFTER DELETE 
+        ON Orders FOR EACH ROW 
+        INSERT INTO Audits 
+        VALUES ("AFTER", CONCAT("Order ", OLD.OrderID, " was deleted at ", CURRENT_TIME(), " on ", CURRENT_DATE()), "DELETE");
+
+
+
+
+
+
+
+
+
+Events
+
+
+
+- one-time scheduled event 
+    -- CREATE EVENT [IF NOT EXIST] GenerateRevenueReport
+        ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 12 HOUR
+        DO 
+        BEGIN 
+            INSERT INTO ReportData (OrderID, ClientID, ProductID, Quantity, Cost, Date) 
+            SELECT *
+            FROM Orders 
+            WHERE Date BETWEEN "2022-08-01" AND "2022-08-31"
+        END 
+    
+
+- Recurring scheduled event syntax
+    -- CREATE EVENT DailyRestock
+        ON SCHEDULE
+        EVERY 1 DAY 
+        DO 
+        BEGIN 
+            IF Products.NumberOfItems < 50 THEN 
+            UPDATE Products SET NumberOfItems = 50;
+            END IF; 
+        END 
+
+- DROP EVENT IF EXIST event_name;
+
+
+
+
+
+
+
+
+
+
+
+Database Optimization
+
+
+
+
+- optimizing select statement
+    -- traget required columns 
+        --- SELECT * ... vs. SELECT col_1, col_2 ...
+    -- avoid functions 
+        --- instead, create a new column, and SELECT will only need to scan that column, instead of performing calculation every time 
+    -- avoid leading wildcards (e.g., find last name that matches '%Ito')
+        --- instead, create a new column that is the reverse of the column applying the leading wildcards to, and there's no need for leading wildcards
+        --- reverses the column to last name + first name, then matching 'Ito%' 
+    -- use inner joins 
+    -- use clauses only when necessary
+        --- DISTINCT requires sorting and slow down the operation vs. use UNION ALL and avoid sorting operation 
+
+
+- index 
+    -- when MySQL retrieves data, it scans the whole table even when only needing to locate specific column values 
+    -- indexing can instruct MySQL to target specific column values instead of scaning the whole thing 
+    -- index is a data structure that provides pointers to sorted data 
+
+    -- two types of index 
+        --- primary index is stored in the table, and it is generated automatically once a table that contains a primary or unique key is created 
+                it forces the order or records in the table itself 
+        --- secondary index is created with the CREATE INDEX statement
+
+    -- CREATE INDEX index_name ON table_name (col1, col2, col3)
+    -- create index only for columns that are frequently performing searches against because new data updated to the original table must be updated 
+        in the index table 
+    
+    -- use EXPLAIN clause to inspect the inner workings of executing a query
+        --- e.g., EXPLAIN
+                    SELECT ContactNumber FROM Clients WHERE FullName = "Jane Delgado";
+        --- Create Index: CREATE INDEX IdxFullName ON Clients(FullName);
+        --- without indexing, this query has to scan 10 rows (shown with EXPLAIN), while only 1 row with indexing 
+
+
+
+- common table expression: optimizing complex database queries by compiling them as simple blocks of code 
+
+    -- WITH 
+            cte1 AS (query1),
+            cte2 AS (query2),
+            cte3 AS (query3),
+        SELECT * FROM cte1 
+        UNION 
+        SELECT * FROM cte2 
+        UNION
+        SELECT * FROM cte3
+    
+    -- example
+        --- without CTE 
+                SELECT CONCAT(AVG(cost), " (2020)") AS "Average Sale" FROM table_orders WHERE YEAR(date) = 2020 
+                UNION 
+                SELECT CONCAT(AVG(cost), " (2021)") AS "Average Sale" FROM table_orders WHERE YEAR(date) = 2021
+                UNION
+                SELECT CONCAT(AVG(cost), " (2022)") AS "Average Sale" FROM table_orders WHERE YEAR(date) = 2022
+
+            output 
+                +-------------------------------+
+                | Average Sale                  |
+                +-------------------------------+
+                | 475.00000000 (2020)           |
+                | 466.66666667 (2021)           |
+                | 495.83333333 (2022)           |
+                +-------------------------------+ 
+        
+        --- with CTE 
+                WITH 
+                    Average_Sales_2020 AS (SELECT CONCAT(AVG(cost), " (2020)") AS "Average Sale" FROM table_orders WHERE YEAR(date) = 2020),
+                    Average_Sales_2021 AS (SELECT CONCAT(AVG(cost), " (2021)") AS "Average Sale" FROM table_orders WHERE YEAR(date) = 2021),
+                    Average_Sales_2022 AS (SELECT CONCAT(AVG(cost), " (2022)") AS "Average Sale" FROM table_orders WHERE YEAR(date) = 2022)
+                SELECT * FROM Average_Sales_2020 
+                UNION 
+                SELECT * FROM Average_Sales_2021 
+                UNION 
+                SELECT * FROM Average_Sales_2022;
+
+
+
+- Prepared Statement: a resuable MySQL statement that acts as a template and holds unspecified values as parameters 
+    -- PREPARE GetOrderStatement FROM 
+        'SELECT ClientID, ProductID, Quantity, Cost FROM Orders WHERE OrderID = ?';
+    -- SET @order_id = 10;
+    -- EXECUTE GetOrderStatement USING @order_id;
+    -- execution doesn't require waiting for repeated compiling because it is already compiled previously 
+
+
+
+
+- Working With JSON: it is the optimal way for storing and accessing data 
+
+    -- CREATE TABLE Activity(ActivityID INT PRIMARY KEY, Properties JSON);
+
+    -- INSERT INTO Activity(ActivityID, Properties) VALUES 
+        (1, '{"ClientID": "Cl1", "ProductID": "P1", "Order": "True" }'),
+        (2, '{"ClientID": "Cl2", "ProductID": "P4", "Order": "False" }'),
+        (3, '{"ClientID": "Cl5", "ProductID": "P5", "Order": "True" }');
+
+    -- SELECT ActivityID, Properties->'$.ClientID', Properties->'$.ProductID', Properties->'$.Order' FROM Activity;
+
+
+
+
+
+
+
+Transactions 
+
+
+
+- transactions - used to roll-back to previous states 
+
+
+- start transaction 
+    -- START TRANSACTION 
+        CODE 
+        CODE 
+        CODE 
+    -- BEGIN 
+        CODE 
+        CODE 
+        CODE 
+
+
+- commit to database 
+    -- add COMMIT to the end of the code block 
+
+
+- roll back 
+    -- add ROLLBACK to the end of the code block to roll back to the state before start transaction 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
